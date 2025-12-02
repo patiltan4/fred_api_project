@@ -1,6 +1,7 @@
 
 import requests
 import logging
+from typing import Optional
 
 # Set up logging
 logging.basicConfig(
@@ -10,12 +11,23 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def fetch_fred_data(series_id):
+def fetch_fred_data(series_id: str, start_date: Optional[str] = None, end_date: Optional[str] = None):
   
     logger.info(f"Fetching data for series_id: {series_id}")
+    if start_date:
+        logger.debug(f"Start date: {start_date}")
+    if end_date:
+        logger.debug(f"End date: {end_date}")
     
-    # Use the graph CSV download endpoint
+    # Build URL with optional date parameters
     url = f"https://fred.stlouisfed.org/graph/fredgraph.csv?id={series_id}"
+    
+    # Add date parameters if provided
+    if start_date:
+        url += f"&cosd={start_date}"
+    if end_date:
+        url += f"&coed={end_date}"
+    
     logger.debug(f"Request URL: {url}")
     
     try:
@@ -64,10 +76,17 @@ def fetch_fred_data(series_id):
 if __name__ == "__main__":
     # Quick test
     try:
-        print("Testing CLVMEURSCAB1GQEA19...")
+        print("Testing CLVMEURSCAB1GQEA19 (full data)...")
         data = fetch_fred_data("CLVMEURSCAB1GQEA19")
         print(data[:500])
         print("\n" + "="*50 + "\n")
-   
+        
+        print("Testing CLVMEURSCAB1GQEA19 with date range (2020-2021)...")
+        data = fetch_fred_data("CLVMEURSCAB1GQEA19", start_date="2021-01-01", end_date="2021-12-31")
+        print(data[:500])
+        print("\n" + "="*50 + "\n")
+        
+        print("Testing invalid series XXXX...")
+        data = fetch_fred_data("XXXX")
     except (ValueError, ConnectionError) as e:
         print(f"Expected error: {e}")
