@@ -1,9 +1,18 @@
 import pandas as pd
 import logging
 from typing import Optional, List
-from fetcher import fetch_fred_data
-from processor import parse_fred_csv, check_all_none, filter_by_dates, filter_by_date_range
-from validator import validate_series_id, validate_date_parameters
+
+# Change these imports
+try:
+    # Try relative imports first (when used as a module)
+    from .fetcher import fetch_fred_data
+    from .processor import parse_fred_csv, check_all_none, filter_by_dates, filter_by_date_range
+    from .validator import validate_series_id, validate_date_parameters
+except ImportError:
+    # Fall back to direct imports (when run directly)
+    from fetcher import fetch_fred_data
+    from processor import parse_fred_csv, check_all_none, filter_by_dates, filter_by_date_range
+    from validator import validate_series_id, validate_date_parameters
 
 # Set up logging
 logging.basicConfig(
